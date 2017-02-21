@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.grishberg</groupId>
-    <artifactId>scrum-pocker-planner-server</artifactId>
+    <artifactId>scrum-poker-planner-server</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>
@@ -35,7 +35,7 @@
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
                     <outputDirectory>${basedir}</outputDirectory>
-                    <finalName>scrum-pocker-planner-server</finalName>
+                    <finalName>scrum-poker-planner-server</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                     <archive>
                         <manifest>
