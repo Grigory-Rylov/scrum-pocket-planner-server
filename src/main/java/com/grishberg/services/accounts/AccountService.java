@@ -1,21 +1,15 @@
 package com.grishberg.services.accounts;
 
 import com.grishberg.data.model.Sprint;
-import com.grishberg.data.model.User;
+import com.grishberg.data.model.UserEntity;
 
 /**
  * Created by grishberg on 20.02.17.
  */
 public interface AccountService {
-    String startMeeting(String meetingName);
 
-    boolean checkMeetingToken(String token);
+    UserEntity registerUser(Sprint sprint, String userName);
 
-    String registerUser(String meetingToken, String userName);
+    UserEntity getUserByAccessToken(String accessToken);
 
-    User getUserByAccessToken(String accessToken);
-
-    Sprint getSprintByToken(String accessToken);
-
-    User[] getUsers(String meetingToken);
 }

@@ -1,58 +1,30 @@
 package com.grishberg.services.accounts;
 
 import com.grishberg.data.model.Sprint;
-import com.grishberg.data.model.User;
+import com.grishberg.data.model.UserEntity;
+import lombok.NonNull;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by grishberg on 20.02.17.
  */
 public class AccountServiceInMemoryImpl implements AccountService {
-    private final Map<String, Sprint> sprints = new ConcurrentHashMap<>();
-    private final Map<String, User> sprintUsers = new ConcurrentHashMap<>();
+    private final AtomicLong userId = new AtomicLong();
+    private final Map<String, UserEntity> userAccessTokens = new ConcurrentHashMap<>();
 
     @Override
-    public String startMeeting(String meetingName) {
-        Sprint newSprint = new Sprint();
-        newSprint.setName(meetingName);
-        newSprint.setCreationDate(new Date());
-        Random rand = new Random();
-        int tokentValue = rand.nextInt(89999) + 10000;
-        String token = String.valueOf(tokentValue);
-        sprints.put(token, newSprint);
-        return token;
-    }
-
-    @Override
-    public boolean checkMeetingToken(String token) {
-        return sprints.containsKey(token);
-    }
-
-    @Override
-    public String registerUser(String meetingToken, String name) {
+    public UserEntity registerUser(@NonNull Sprint sprint, @NonNull String userName) {
         String accessToken = UUID.randomUUID().toString();
-        sprintUsers.put(accessToken, new User(name));
-        return accessToken;
+        UserEntity user = new UserEntity(userId.incrementAndGet(), userName, accessToken, sprint);
+        userAccessTokens.put(accessToken, user);
+        return user;
     }
 
     @Override
-    public User getUserByAccessToken(String accessToken) {
-        return sprintUsers.get(accessToken);
-    }
-
-    @Override
-    public Sprint getSprintByToken(String sprintToken) {
-        return sprints.get(sprintToken);
-    }
-
-    @Override
-    public User[] getUsers(String meetingToken) {
-        ArrayList<User> usersArray = new ArrayList<>();
-        for (Map.Entry<String, User> entry : sprintUsers.entrySet()) {
-            usersArray.add(entry.getValue());
-        }
-        return usersArray.toArray(new User[usersArray.size()]);
+    public UserEntity getUserByAccessToken(@NonNull String accessToken) {
+        return userAccessTokens.get(accessToken);
     }
 }

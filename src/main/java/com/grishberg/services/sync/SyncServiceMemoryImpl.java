@@ -1,34 +1,45 @@
 package com.grishberg.services.sync;
 
 import com.grishberg.data.model.Bet;
+import com.grishberg.data.model.Sprint;
 import com.grishberg.data.model.SprintTask;
-import com.grishberg.data.model.User;
-import com.grishberg.services.accounts.AccountService;
+import com.grishberg.data.model.UserEntity;
+import lombok.NonNull;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by grishberg on 20.02.17.
  */
-public class SyncServiceMemoryImpl implements SyncService {
-    private final List<SprintTask> tasks;
-    private final Map<User, Bet> bets;
+public class SyncServiceMemoryImpl implements SprintService {
+    private final Map<Sprint, SprintTask> tasks;
+    private final Map<Sprint, Map<UserEntity, Bet>> bets;
     private final AtomicLong taskId = new AtomicLong();
-    private final AccountService accountService;
+    private final Map<Sprint, List<UserEntity>> sprintUsers = new ConcurrentHashMap<>();
+    private final Map<String, Sprint> sprints = new ConcurrentHashMap<>();
 
-    public SyncServiceMemoryImpl(AccountService accountService) {
-        this.accountService = accountService;
-        tasks = new CopyOnWriteArrayList<>();
+    public SyncServiceMemoryImpl() {
+        tasks = new ConcurrentHashMap<>();
         bets = new ConcurrentHashMap<>();
     }
 
     @Override
-    public SprintTask addNewTaskToSprint(String name, String description) {
+    public String startSprint(@NonNull String name) {
+        Sprint newSprint = new Sprint();
+        newSprint.setName(name);
+        newSprint.setCreationDate(new Date());
+        Random rand = new Random();
+        int tokenValue = rand.nextInt(89999) + 10000;
+        String token = String.valueOf(tokenValue);
+        sprints.put(token, newSprint);
+        sprintUsers.put(newSprint, new ArrayList<>());
+        return token;
+    }
+
+    @Override
+    public SprintTask addNewTaskToSprint(@NonNull String name, @NonNull String description) {
         bets.clear();
         SprintTask task = new SprintTask();
         task.setId(taskId.incrementAndGet());
@@ -38,16 +49,60 @@ public class SyncServiceMemoryImpl implements SyncService {
     }
 
     @Override
-    public void putBet(User user, int betValue) {
-        bets.put(user, new Bet(user.getName(), betValue));
+    public boolean checkSprintToken(@NonNull String token) {
+        return sprints.containsKey(token);
     }
 
     @Override
-    public Bet[] getBets() {
+    public void putBet(@NonNull UserEntity user, int betValue) {
+        Sprint sprint = getSprintByUser(user);
+        Map<UserEntity, Bet> betsForSprint = bets.get(sprint);
+        if (betsForSprint == null) {
+            betsForSprint = new ConcurrentHashMap<>();
+            bets.put(sprint, betsForSprint);
+        }
+        betsForSprint.put(user, new Bet(user.getName(), betValue));
+    }
+
+    private Sprint getSprintByUser(UserEntity user) {
+        return user.getSprint();
+    }
+
+    @Override
+    public Bet[] getBets(@NonNull Sprint sprint) {
+        Map<UserEntity, Bet> betsForSprint = bets.get(sprint);
+        if (betsForSprint == null || betsForSprint.size() < getUsersForSprint(sprint).length) {
+            return new Bet[0];
+        }
         ArrayList<Bet> betsArray = new ArrayList<>();
-        for (Map.Entry<User, Bet> entry : bets.entrySet()) {
+        for (Map.Entry<UserEntity, Bet> entry : betsForSprint.entrySet()) {
             betsArray.add(entry.getValue());
         }
         return betsArray.toArray(new Bet[betsArray.size()]);
+    }
+
+    @Override
+    public Sprint getSprintByToken(@NonNull String sprintToken) {
+        return sprints.get(sprintToken);
+    }
+
+    @Override
+    public void addMemberToSprint(UserEntity user, Sprint sprint) {
+        List<UserEntity> currentSprintUsers = sprintUsers.get(sprint);
+        if (currentSprintUsers == null) {
+            currentSprintUsers = new ArrayList<>();
+        }
+        currentSprintUsers.add(user);
+    }
+
+    @Override
+    public UserEntity[] getUsersForSprint(Sprint sprint) {
+        List<UserEntity> users = sprintUsers.get(sprint);
+        return users != null ? users.toArray(new UserEntity[users.size()]) : new UserEntity[0];
+    }
+
+    @Override
+    public SprintTask getCurrentTask(Sprint sprint) {
+        return tasks.get(sprint);
     }
 }

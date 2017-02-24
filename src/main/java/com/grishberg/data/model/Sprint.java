@@ -10,6 +10,6 @@ import java.util.Date;
 @Data
 public class Sprint {
     private String name;
-    private User user;
+    private UserEntity user;
     private Date creationDate;
 }

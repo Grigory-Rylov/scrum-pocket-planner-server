@@ -8,6 +8,6 @@ public final class Const {
     }
 
     private static final String API = "/poker-planner";
-    public static final String VER = API + "/v1.0";
+    public static final String VER = API + "/v1.0/*";
 
 }
