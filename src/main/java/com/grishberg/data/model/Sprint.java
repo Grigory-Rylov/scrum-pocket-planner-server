@@ -10,6 +10,5 @@ import java.util.Date;
 @Data
 public class Sprint {
     private String name;
-    private UserEntity user;
     private Date creationDate;
 }

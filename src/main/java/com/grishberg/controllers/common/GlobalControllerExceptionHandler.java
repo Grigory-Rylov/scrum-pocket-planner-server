@@ -17,7 +17,7 @@ import java.util.Map;
 @ControllerAdvice
 class GlobalControllerExceptionHandler {
     @ResponseBody
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.OK)
     @ExceptionHandler(Exception.class)
     public Map handleConflict(Exception e) {
         log.error("exception:", e);

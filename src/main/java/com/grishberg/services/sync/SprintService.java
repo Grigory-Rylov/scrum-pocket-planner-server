@@ -11,11 +11,9 @@ import com.grishberg.data.model.UserEntity;
 public interface SprintService {
     UserEntity[] getUsersForSprint(Sprint sprint);
 
-    boolean checkSprintToken(String token);
-
     String startSprint(String name);
 
-    SprintTask addNewTaskToSprint(String name, String description);
+    SprintTask addNewTaskToSprint(Sprint sprint, String name, String description);
 
     Sprint getSprintByToken(String sprintToken);
 

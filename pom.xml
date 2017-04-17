@@ -29,6 +29,16 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <!-- no need to specify the groupId, it defaults to "org.apache.maven.plugins" -->
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.6</version> <!-- explicit version is safer for build consistency than implicit -->
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/assembly/distribution.xml</descriptor> <!-- use the path to the file starting from base directory -->
+                    </descriptors>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 

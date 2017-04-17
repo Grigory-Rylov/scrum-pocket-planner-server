@@ -39,18 +39,14 @@ public class SyncServiceMemoryImpl implements SprintService {
     }
 
     @Override
-    public SprintTask addNewTaskToSprint(@NonNull String name, @NonNull String description) {
+    public SprintTask addNewTaskToSprint(@NonNull Sprint sprint, @NonNull String name, @NonNull String description) {
         bets.clear();
         SprintTask task = new SprintTask();
         task.setId(taskId.incrementAndGet());
         task.setDescription(description);
         task.setName(name);
+        tasks.put(sprint, task);
         return task;
-    }
-
-    @Override
-    public boolean checkSprintToken(@NonNull String token) {
-        return sprints.containsKey(token);
     }
 
     @Override

@@ -30,4 +30,8 @@ public interface SprintController {
     @RequestMapping(value = "/getCurrentTaskForSprint")
     Map getCurrentTaskForSprint(HttpServletRequest request,
                                 @RequestParam String sprintToken) throws AppException.WrongMeetingTokenException;
+
+    @RequestMapping(value = "/getSprintInfo")
+    Map getSprintInfo(HttpServletRequest request,
+                                @RequestParam String sprintToken) throws AppException.WrongMeetingTokenException;
 }

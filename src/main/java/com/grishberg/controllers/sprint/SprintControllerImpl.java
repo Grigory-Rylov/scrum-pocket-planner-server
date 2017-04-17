@@ -5,6 +5,7 @@ import com.grishberg.controllers.common.BaseController;
 import com.grishberg.data.model.Sprint;
 import com.grishberg.data.model.SprintResponse;
 import com.grishberg.exception.AppException;
+import com.grishberg.exception.AppException.WrongMeetingTokenException;
 import com.grishberg.services.sync.SprintService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,14 +33,20 @@ public class SprintControllerImpl extends BaseController implements SprintContro
     public Map makeSprintTask(HttpServletRequest request,
                               @RequestParam String sprintToken,
                               @RequestParam String name,
-                              @RequestParam String description) throws AppException.WrongMeetingTokenException {
+                              @RequestParam String description) throws WrongMeetingTokenException {
         Sprint sprint = getSprintByToken(sprintToken);
-        return RUtils.success(syncService.addNewTaskToSprint(name, description));
+        return RUtils.success(syncService.addNewTaskToSprint(sprint, name, description));
     }
 
     @Override
-    public Map getCurrentTaskForSprint(HttpServletRequest request, @RequestParam String sprintToken) throws AppException.WrongMeetingTokenException {
+    public Map getCurrentTaskForSprint(HttpServletRequest request, @RequestParam String sprintToken) throws WrongMeetingTokenException {
         Sprint sprint = getSprintByToken(sprintToken);
         return RUtils.success(syncService.getCurrentTask(sprint));
+    }
+
+    @Override
+    public Map getSprintInfo(HttpServletRequest request, @RequestParam String sprintToken) throws WrongMeetingTokenException {
+        Sprint sprint = getSprintByToken(sprintToken);
+        return RUtils.success(sprint);
     }
 }
